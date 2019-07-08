@@ -23,11 +23,13 @@ const debounce = (fn, obj) => {
 }
 
 
-const initEvent = (hero) => {
+const initEvent = (hero,keyConfig) => {
 	let set = new Set()
 	let timer
 	document.addEventListener('keydown', function(evnet) {
 		if(hero.state === 0) return // 掉落状态一些按键失效
+
+		// if(!set.has(evnet.key)) {}
 		set.add(evnet.key)
 		perform()
 
@@ -37,27 +39,38 @@ const initEvent = (hero) => {
 		perform()
 	}, false)
 
+	let eventStr = ''
+
 	const perform = () => {
-		let eventStr = ''
+		// debugger
+		console.log(eventStr)
 		for (let item of set.keys()) {
 			eventStr += item
+			
 		}
 		switch (eventStr) {
 			case 'w':
 				let tar = down(hero,world)
 				hero.jump(tar)
+				eventStr = ''
+				break;
+			case  'a':
+				hero.left()
+				eventStr = ''
 				break;
 			case 'd':
-				// world.updata()
-				console.log(hero.offset)
 				hero.right()
+				eventStr = ''
 				break;
-			case 't':
+			case 'dj':
+				// debugger
 				hero.rightJump()
+				// eventStr = 'd'
 				break;
 		}
 
 	}
+	return perform
 }
 
 

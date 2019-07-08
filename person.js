@@ -1,5 +1,5 @@
 import {world} from './index'
-
+import initEvent from './control'
 
 class Person {
 	constructor(base) {
@@ -67,6 +67,7 @@ class Person {
 		})
 	}
 	right() {
+		// console.log(this.timer)
 		if(this.timer) return
 		// this.state = 0
 		this.action = 'walk'
@@ -82,8 +83,25 @@ class Person {
 			// this.state = 1
 		})
 	}
-	rightJump(fn) {
+	left() {
 		if(this.timer) return
+		// this.state = 0
+		this.action = 'walk'
+		this._walk(
+			this.runEl,
+			()=> {
+				// world.screen.l+=this.speed// 移动地图	
+				// world.updata(this.speed)
+				this.offset.x -=this.speed
+			})
+		.then(()=>{
+			this.action  = null
+			// this.state = 1
+		})
+	}
+	rightJump(fn) {
+
+		this.stop()
 		this.state = 0
 		const x = () => {
 			this.offset.x +=this.speed
@@ -95,6 +113,8 @@ class Person {
 		})
 		.then(()=> {
 			this.state = 1
+			initEvent()
+			// console.log(initEvent)
 		})
 
 	}
@@ -125,16 +145,22 @@ class Person {
 		)
 	}
 	drop(tar) {
-		console.log(tar)
-		if(Math.abs(this.offset.y-tar)<10) {
-			this.offset.y = tar
+		// console.log(this)
+		let a = parseInt(this.offset.y)
+		let b = parseInt(tar)
+
+		if(Math.abs(a-b)<5) {
+			this.offset.y = parseInt(tar)
 			this.state = 1
 			this.droping = false
 			return
 		}
+
 		this.state = 0
 		this.droping = true
+		this.stop()
 		this.offset.y+=2
+
 	}
 
 	/**
