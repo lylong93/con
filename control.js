@@ -1,26 +1,18 @@
-import {down,hero,world} from './index'
+import {down,hero,world,udown} from './index'
 
-
-const keyConfig = {
-	up: 'w',
-	down: 's',
-	left: 'a',
-	right: 'd'
-}
-
-const debounce = (fn, obj) => {
-	let timer
-	return function() {
-		if (timer) {
-			return
-		}
-		timer = setTimeout(function() {
-			fn.call(obj)
-			clearTimeout(timer)
-			timer = null
-		}, 100)
-	}
-}
+// const debounce = (fn, obj) => {
+// 	let timer
+// 	return function() {
+// 		if (timer) {
+// 			return
+// 		}
+// 		timer = setTimeout(function() {
+// 			fn.call(obj)
+// 			clearTimeout(timer)
+// 			timer = null
+// 		}, 100)
+// 	}
+// }
 
 
 const initEvent = (hero,keyConfig) => {
@@ -28,44 +20,44 @@ const initEvent = (hero,keyConfig) => {
 	let timer
 	document.addEventListener('keydown', function(evnet) {
 		if(hero.state === 0) return // 掉落状态一些按键失效
-
-		// if(!set.has(evnet.key)) {}
 		set.add(evnet.key)
 		perform()
-
 	}, false)
 	document.addEventListener('keyup', function(evnet) {
 		set.delete(evnet.key)
 		perform()
 	}, false)
 
-	let eventStr = ''
-
+	
 	const perform = () => {
 		// debugger
-		console.log(eventStr)
+		let eventStr=''
 		for (let item of set.keys()) {
-			eventStr += item
+			eventStr +=item
 			
 		}
 		switch (eventStr) {
 			case 'w':
 				let tar = down(hero,world)
 				hero.jump(tar)
-				eventStr = ''
 				break;
-			case  'a':
+			case 's':
+				 udown(hero,world)
+
+				hero.dd()
+				break;
+			case 'a':
 				hero.left()
-				eventStr = ''
 				break;
 			case 'd':
 				hero.right()
-				eventStr = ''
 				break;
-			case 'dj':
-				// debugger
-				hero.rightJump()
-				// eventStr = 'd'
+			case 't':
+				let tar1 = down(hero,world)
+				hero.rightJump(tar1)
+				break;
+			case 'j':
+				hero.fire()
 				break;
 		}
 

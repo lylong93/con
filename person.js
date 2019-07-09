@@ -1,4 +1,4 @@
-import {world} from './index'
+import {world,ldwon} from './index'
 import initEvent from './control'
 
 class Person {
@@ -13,25 +13,26 @@ class Person {
 		// drop 0
 		// land 1
 		this.state =1
-
+		this.end = false
 		this.action  
 
 		this.droping = false
-		
+		this.ddd =false
 		this.speed = 6;
 		//裁剪位置
 		this.cut;
 		//帧
 		this.fram;
 		//
-		this.offset= {
-			x:320,
-			y:216
-		}
+		// this.offset= {
+		// 	x:320,
+		// 	y:216
+		// }
 		this.timer =null
 	}
 	// 更新帧
 	updata() {
+		// console.log(this.cut)
 		this.cut = {
 			x:this.fram[0],
 			y:this.fram[1],
@@ -43,12 +44,11 @@ class Person {
 	// 动作
 	jump(tar) {
 		if(this.timer) return
-		this.state = 0
+			this.state = 0
 		// 向上跃
 		const y =()=> {
-
 			if(Math.abs(this.offset.y-tar)<5) {
-				this.offset.y = tar
+				this.offset.y = parseInt(tar)
 				return true
 			}
 		}
@@ -70,69 +70,91 @@ class Person {
 		// console.log(this.timer)
 		if(this.timer) return
 		// this.state = 0
-		this.action = 'walk'
-		this._walk(
-			this.runEl,
-			()=> {
-				// world.screen.l+=this.speed// 移动地图	
-				world.updata(this.speed)
+	this.action = 'walk'
+	this._walk(
+		this.runEl,
+		()=> {
+			world.updata(this.speed)
 
-			})
-		.then(()=>{
-			this.action  = null
+		})
+	.then(()=>{
+		this.action  = null
 			// this.state = 1
 		})
 	}
 	left() {
 		if(this.timer) return
-		// this.state = 0
+			// this.state = 0
 		this.action = 'walk'
 		this._walk(
 			this.runEl,
 			()=> {
-				// world.screen.l+=this.speed// 移动地图	
-				// world.updata(this.speed)
-				this.offset.x -=this.speed
-			})
+					// world.screen.l+=this.speed// 移动地图	
+					// world.updata(this.speed)
+					this.offset.x -=this.speed
+				})
 		.then(()=>{
 			this.action  = null
-			// this.state = 1
-		})
+				// this.state = 1
+			})
 	}
-	rightJump(fn) {
-
+	rightJump(tar) {
 		this.stop()
 		this.state = 0
+
 		const x = () => {
-			this.offset.x +=this.speed
+			world.updata(this.speed/2)
+			let _x = this.offset.x += this.speed/2
+			let tar = ldwon(this,_x,world) 
+			if(tar>0 && Math.abs(this.offset.y-tar)<5) {
+				// debugger
+				this.offset.y = tar
+				this.state =1
+				this.end = true // 打断后面视图的执行
+				this.stop()
+				return true
+			}
+
+		}
+		const move = () => {
+			world.updata(this.speed/2)
 		}
 
-		this.up(x)
+		this.up(move)
 		.then(()=> {
+			// debugger
 			return this.down(x)
+			// this.stop()
 		})
 		.then(()=> {
+			// this.stop()
 			this.state = 1
-			initEvent()
-			// console.log(initEvent)
+		})
+		.catch(()=>  {
+			this.state = 1
+			this.end = false
 		})
 
 	}
+	dd(tar) {
+		this.ddd = true
+	}
+
 	// 分解动作
 	up(fn) {
 		return this._walk(
 			this.upEl,
 			()=> {
 				if(fn) fn()
-				this.offset.y -=this.speed
+					this.offset.y -=this.speed
 			}
-		)
+			)
 	}
 	down(fn) {
 		return this._walk(
 			this.upEl,
 			() => {
-				// 终止标记
+				// 下降过程判断一些终止
 				let flag
 				if (fn) {
 					flag = fn()
@@ -142,10 +164,9 @@ class Person {
 				}
 
 			}
-		)
+			)
 	}
 	drop(tar) {
-		// console.log(this)
 		let a = parseInt(this.offset.y)
 		let b = parseInt(tar)
 
@@ -153,51 +174,52 @@ class Person {
 			this.offset.y = parseInt(tar)
 			this.state = 1
 			this.droping = false
+			this.ddd = false
 			return
 		}
 
 		this.state = 0
 		this.droping = true
 		this.stop()
-		this.offset.y+=2
-
+		this.offset.y = parseInt(this.offset.y) + 2
 	}
-
 	/**
 	els 变换视图
 	fn  其他附加
 	**/
 	_walk(els,fn) {
-	let zhen = 60
-	if(this.action === 'walk') {
-		zhen  = 120
-	}
-	return new Promise ( (resolve,rejcet)=> {
-		let i=0;
-		this.timer = setInterval(()=> {
-			if(fn) fn()
-			i++
-			if(i>els.length-1) {
-				i=0
-				this.stop()
-				resolve()
-				return
-			}			
-			this.fram = els[i]
-			this.updata()
-		},zhen)
-	})
+		let zhen = 60
+		if(this.action === 'walk') {
+			zhen  = 110
+		}
+		return new Promise ( (resolve,rejcet)=> {
+			let i=0;
+			this.timer = setInterval(()=> {
+				if(fn) fn()
+					if(this.end) return rejcet()
+						i++
+					if(i>els.length-1) {
+						i=0
+						this.stop()
+						resolve()
+						return
+					}			
+					this.fram = els[i]
+					this.updata()
+				},zhen)
+		})
 	}
 	//站立状态
 	stand() {
-		// this.state = 1
+		// this.state =1
 		this.fram = this.runEl[0]
 		this.updata()
 	}
 	stop() {
-		clearInterval(this.timer)
 		this.stand()
+		clearInterval(this.timer)
 		this.timer = null
+		
 	}
 
 

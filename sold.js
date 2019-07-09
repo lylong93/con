@@ -1,17 +1,18 @@
 import Person from './person'
 
-class Hero extends Person{
+class Sold extends Person{
 	constructor(base,name) {
 		super(base)	
 		this.name = name
 		this.health = 5
 		this.runEl = [
-			[1,42,16,35],
-			[17,42,19,35],
-			[37,42,20,35],
-			// [57,42,18,35],
-			// [75,42,18,35],
-			// [94,42,20,35],
+			[1,1,17,35],
+			[18,1,19,35],
+			[39,1,20,35],
+			[55,1,20,35],
+			[72,1,20,35],
+			[93,1,20,35],
+			[109,1,20,35],
 
 		]
 		this.upEl = [
@@ -28,27 +29,24 @@ class Hero extends Person{
 			[157,42,16,35],
 
 		]
-		this.fiEl = [81,7,40,10]
+		this.dEl = [
+			[117,42,16,35],
+			[135,42,20,35],
+			[157,42,16,35],
+			[175,42,20,35],
+		]
 		this.offset= {
-			x:320,
-			y:216
+			x:760,
+			y:155
 		}
-
-		this.fires =[]
 		this.init()
 	}
 	init() {
 		this.stand()
 	}
-	death(){
-		// this.up()
-	}
-	fire(){
-		this.fires.push({
-			x:this.offset.x+50,
-			y:this.offset.y+20
-		})
+	offHealth(){
+		this.health --
 	}
 }
 
-export default Hero
+export default Sold
